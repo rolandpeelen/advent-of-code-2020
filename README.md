@@ -82,4 +82,30 @@ There are 200 items.
 While this could be solved with some nested for loops. This might be easier / quicker with a combination of my earlier idea;
 
 ## Day One -- Concluding
-While incoherent, my initial idea of working with the sorted list was actually what we would want to do. If we're under 2020, you can call with the `tail`, if were over, you can call with `init`, slowly creeping towards the actuall 2020.
+While incoherent, my initial idea of working with the sorted list was actually what we would want to do. If we're under 2020, you can call with the `tail`, if were over, you can call with `init`, slowly creeping towards the actuall 2020. Given the following example, that would reduce down to:
+
+  ```
+  find: x + y + z === 210
+  tail == take everything but first
+  init == take everything but last
+  [
+     93, 134,  14, 169, 101,   2,  80,  64,  35,
+    165, 131, 167, 198,  19, 199, 196, 126,  47,
+     76, 103, 192, 150, 102, 121,   2,  99, 177,
+     27, 195, 123, 104, 171, 169, 153,  97,  83,
+    133,  59, 158,  78
+  ]
+  sort it:
+  [
+      2,   2,  14,  19,  27,  35,  47,  59,  64,
+     76,  78,  80,  83,  93,  97,  99, 101, 102,
+    103, 104, 121, 123, 126, 131, 133, 134, 150,
+    153, 158, 165, 167, 169, 169, 171, 177, 192,
+    195, 196, 198, 199
+  ]
+  1: head == 2 ; tail == 199 -> 201 (too small, init)
+  2: head == 2 ; tail == 199 -> 201 (too small, init)
+  3: head == 14 ; tail == 199 -> 213 (too big, tail)
+  4: head == 14 ; tail == 198 -> 212 (too big, tail)
+  5: head == 14 ; tail == 196 -> 210 (spot on)
+    ```
