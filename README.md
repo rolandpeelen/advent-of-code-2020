@@ -2,7 +2,7 @@
 
 ## Day One
 Given a list of integers, find the two items that sum to 2020.
-Thoughts;
+### Thoughts;
 - Naive approach: Naively going through the items one-by-one will give you n^n-1 solution space
 - Slightly cleverer: The maximum amount of naive we should ever need is 1010. We could built a list of pairs `(n, 2020-n)` where `n = 0...1010`. Then iterate over that list and find the items. By sorting the list and using binary search, we can get an average lookup of O(log n) per item.
 - Possibly interesting: If we search the list, then recursively take the tail and head and compare them, we should be able to find a combination that works;
@@ -34,4 +34,6 @@ Then we'll make a function that takes the head and tail, compares it;
   lastHead / tail
   head / lastTail
 
-
+### One
+I might be overthinking this...
+We could also just go through the list and keep a list of the values we've seen subtracted from 2020. Then simply check when we encounter one of the ones we've already seen...
