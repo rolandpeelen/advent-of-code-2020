@@ -81,4 +81,5 @@ There are 200 items.
 
 While this could be solved with some nested for loops. This might be easier / quicker with a combination of my earlier idea;
 
-
+## Day One -- Concluding
+While incoherent, my initial idea of working with the sorted list was actually what we would want to do. If we're under 2020, you can call with the `tail`, if were over, you can call with `init`, slowly creeping towards the actuall 2020.
