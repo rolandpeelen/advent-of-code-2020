@@ -28,6 +28,7 @@ find2020 x xs =
 findSecond :: Int -> [Int] -> Maybe Int
 findSecond _ [] = Nothing
 findSecond x xs
-  | x + head xs + last xs == 2020 = Just (x * head xs * last xs)
-  | x + head xs + last xs < 2020 = findSecond x $ tail xs
-  | x + head xs + last xs > 2020 = findSecond x $ init xs
+  | sum == 2020 = Just (x * head xs * last xs)
+  | sum < 2020 = findSecond x $ tail xs
+  | sum > 2020 = findSecond x $ init xs
+  where sum = x + head xs + last xs
