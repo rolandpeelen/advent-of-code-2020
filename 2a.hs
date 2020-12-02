@@ -8,19 +8,17 @@ main = do
   input <- getContents
   putStr $ show $ fn $ lines input
 
-
---7-10 q: kqhcqqqqqqqqn
 passwordParser :: GenParser Char st (Int, Int, Char, String)
 passwordParser = do
-  n1 <- many1 digit
+  min <- many1 digit
   char '-'
-  n2 <- many1 digit
+  max <- many1 digit
   spaces
-  c1 <- letter
+  character <- letter
   char ':'
   spaces
-  pass <- many1 letter 
-  return (read n1, read n2, c1, pass)
+  password <- many1 letter
+  return (read min, read max, character, password)
 
 passwordChecker :: (Int, Int, Char, String) -> Int
 passwordChecker (min, max, char, pass)
