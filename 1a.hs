@@ -1,14 +1,20 @@
+import Data.Sequence (Seq(..), fromList)
 import Data.List
 import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ find2020 $ sort $ map read $ lines input
+  case find2020 $ fromList $ sort $ map read $ lines input of
+   Just x -> putStr $ show x
+   Nothing -> putStr "Not Found"
 
-find2020 :: [Int] -> Int
-find2020 [] = -1
+find2020 :: Seq Int -> Maybe Int
+find2020 Empty = Nothing
 find2020 xs
-  | sum == 2020 = head xs * last xs
-  | sum < 2020 = find2020 $ tail xs
-  | sum > 2020 = find2020 $ init xs
-  where sum = head xs + last xs 
+  | sum == 2020 = Just $ head * last
+  | sum < 2020 = find2020 tail
+  | otherwise = find2020 init
+  where
+      sum = head + last
+      head :<| tail = xs
+      init :|> last = xs
