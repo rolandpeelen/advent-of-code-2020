@@ -27,7 +27,7 @@ matchesCharInGrid x y char str = case charAtIndex x str of
 add :: Coordinate -> Coordinate -> Coordinate
 add (x, y) (xInc, yInc) = (x + xInc, y + yInc)
 
-folderb :: (Maybe Coordinate, Coordinate, Count) -> [String] -> Int
+folderb :: (Maybe Coordinate, IncPair, Count) -> [String] -> Int
 folderb (Nothing, inc, count) xs = folderb (Just inc, inc, count) xs
 folderb (Just (x, y), inc, count) xs = case matchesCharInGrid x y '#' xs of
   OutOfBounds -> count
