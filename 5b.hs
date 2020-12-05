@@ -8,38 +8,53 @@ magicRowPartitionLength = 7
 
 data Rounding = Up | Down
 
-type BinPartLst = String
-
 type Row = Int
 
 type Seat = Int
 
 type Place = (Row, Seat)
 
+data Half = LeftH | RightH
+
+type PartitionSteps = [Char]
+
+type PartitionChars = (Char, Char)
+
+type PartitionInts = (Int, Int)
+
 main = do
   input <- getContents
   putStr $ show $ fn $ lines input
 
-safeRndUp :: (Int, Int) -> Int
-safeRndUp (x, 0) = x
-safeRndUp (x, _) = x + 1
+getNextHalf :: Half -> PartitionInts -> (Int, Int)
+getNextHalf LeftH (left, right) = (left, right - (right - left + 1) `div` 2)
+getNextHalf RightH (left, right) = (left + (right - left + 1) `div` 2, right)
 
-divRnd :: Rounding -> Int -> Int
-divRnd Up x = safeRndUp $ x `divMod` 2
-divRnd Down x = fst $ x `divMod` 2
+walkPartition :: PartitionChars -> PartitionInts -> String -> Int
+walkPartition pChars (left, right) [char] = if char == fst pChars then left else right
+walkPartition pChars pInts (head : xs)
+  | head == fst pChars = walkPartition pChars (getNextHalf LeftH pInts) xs
+  | head == snd pChars = walkPartition pChars (getNextHalf RightH pInts) xs
+  where
 
-walkBinaryPartitionLs :: (Char, Char) -> [Int] -> [Char] -> Int
-walkBinaryPartitionLs (lower, _) [x, y] [char] = if char == lower then x else y
-walkBinaryPartitionLs (lower, upper) xs (head : ys) = case (head == lower) of
-  True -> walkBinaryPartitionLs (lower, upper) (take (length xs `div` 2) xs) ys
-  False -> walkBinaryPartitionLs (lower, upper) (drop (length xs `div` 2) xs) ys
+genRow :: PartitionSteps -> Row
+genRow row = walkPartition ('F', 'B') (0, 127) row
 
-genSeatId :: (BinPartLst, BinPartLst) -> Int
-genSeatId (row, seat) = (((walkBinaryPartitionLs ('F', 'B') [0 .. 127] row) * 8) + (walkBinaryPartitionLs ('L', 'R') [0 .. 7] seat))
+genSeat :: PartitionSteps -> Seat
+genSeat seat = walkPartition ('L', 'R') (0, 7) seat
 
-findMissing:: [Int] -> Int
-findMissing xs = sum [head xs .. head xs+length xs] - sum xs
+genPlaceId :: (String, String) -> Int
+genPlaceId (row, seat) = (genRow row * 8) + genSeat seat
 
---
---fn :: [String] -> Maybe Int
-fn xs = findMissing $ sort $ map genSeatId $ map (splitAt magicRowPartitionLength) xs
+findAllMissing :: [Int] -> [Int] -> [Int]
+findAllMissing acc [] = acc
+findAllMissing acc [a, b] 
+  | succ a == b = acc 
+  | otherwise = (succ a:acc)
+findAllMissing acc (a:b:xs)
+  | succ a == b = findAllMissing acc (b:xs)
+  | otherwise = findAllMissing (succ a:acc) (b:xs)
+
+
+fn :: [String] -> [Int]
+fn xs = findAllMissing [] $ sort $ map genPlaceId $ map (splitAt magicRowPartitionLength) xs

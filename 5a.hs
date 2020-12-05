@@ -6,40 +6,49 @@ magicRowPartitionLength = 7
 
 data Rounding = Up | Down
 
-type BinPartLst = String
+type Row = Int
 
-type LowerChar = Char
+type Seat = Int
 
-type UpperChar = Char
+type Place = (Row, Seat)
 
-type BinPartsInstr = (LowerChar, UpperChar, Integer, Integer)
+data Half = LeftH | RightH
+
+type PartitionSteps = [Char]
+
+type PartitionChars = (Char, Char)
+
+type PartitionInts = (Int, Int)
 
 main = do
   input <- getContents
   putStr $ show $ fn $ lines input
 
-safeRndUp :: (Integer, Integer) -> Integer
-safeRndUp (x, 0) = x
-safeRndUp (x, _) = x + 1
+getNextHalf :: Half -> PartitionInts -> (Int, Int)
+getNextHalf LeftH (left, right) = (left, right - (right - left + 1) `div` 2)
+getNextHalf RightH (left, right) = (left + (right - left + 1) `div` 2, right)
 
-divRnd :: Rounding -> Integer -> Integer
-divRnd Up x = safeRndUp $ x `divMod` 2
-divRnd Down x = fst $ x `divMod` 2
+walkPartition :: PartitionChars -> PartitionInts -> String -> Int
+walkPartition pChars (left, right) [char] = if char == fst pChars then left else right
+walkPartition pChars pInts (head : xs)
+  | head == fst pChars = walkPartition pChars (getNextHalf LeftH pInts) xs
+  | head == snd pChars = walkPartition pChars (getNextHalf RightH pInts) xs
+  where
 
-walkBinaryPartition :: BinPartsInstr -> BinPartLst -> Integer
-walkBinaryPartition (lowerC, _, left, right) [char] = if char == lowerC then left else right
-walkBinaryPartition (lowerC, upperC, left, right) (head : xs) = case (head == lowerC) of
-  True -> walkBinaryPartition (lowerC, upperC, left, right - divRnd Down (right - left)) xs
-  False -> walkBinaryPartition (lowerC, upperC, right - divRnd Up (right - left), right) xs
+genRow :: PartitionSteps -> Row
+genRow row = walkPartition ('F', 'B') (0, 127) row
 
-genSeatId :: (BinPartLst, BinPartLst) -> Integer
-genSeatId (row, seat) = ((walkBinaryPartition ('F', 'B', 0, 127) row) * 8) + (walkBinaryPartition ('L', 'R', 0, 7) seat)
+genSeat :: PartitionSteps -> Seat
+genSeat seat = walkPartition ('L', 'R') (0, 7) seat
 
-maxAcc :: Integer -> Integer -> Integer
+genPlaceId :: (String, String) -> Int
+genPlaceId (row, seat) = (genRow row * 8) + genSeat seat
+
+maxAcc :: Int -> Int -> Int
 maxAcc acc x = if x > acc then x else acc
 
-maxAccList :: [Integer] -> Integer
+maxAccList :: [Int] -> Int
 maxAccList xs = foldl maxAcc 0 xs
 
-fn :: [String] -> Integer
-fn xs = maxAccList $ map genSeatId $ map (splitAt magicRowPartitionLength) xs
+fn :: [String] -> Int
+fn xs = maxAccList $ map genPlaceId $ map (splitAt magicRowPartitionLength) xs
