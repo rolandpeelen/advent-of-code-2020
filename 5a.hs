@@ -1,7 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.Either
-import Text.ParserCombinators.Parsec
 import Prelude
 
 magicRowPartitionLength = 7
@@ -20,15 +18,19 @@ main = do
   input <- getContents
   putStr $ show $ fn $ lines input
 
+safeRndUp :: (Integer, Integer) -> Integer
+safeRndUp (x, 0) = x
+safeRndUp (x, _) = x + 1
+
 divRnd :: Rounding -> Integer -> Integer
-divRnd Up x = fst $ x `divMod` 2
-divRnd Down x = (+ 1) $ fst $ x `divMod` 2
+divRnd Up x = safeRndUp $ x `divMod` 2
+divRnd Down x = fst $ x `divMod` 2
 
 walkBinaryPartition :: BinPartsInstr -> BinPartLst -> Integer
 walkBinaryPartition (lowerC, _, left, right) [char] = if char == lowerC then left else right
 walkBinaryPartition (lowerC, upperC, left, right) (head : xs) = case (head == lowerC) of
-  True -> walkBinaryPartition (lowerC, upperC, left, right - divRnd Up (right - left)) xs
-  False -> walkBinaryPartition (lowerC, upperC, right - divRnd Down (right - left), right) xs
+  True -> walkBinaryPartition (lowerC, upperC, left, right - divRnd Down (right - left)) xs
+  False -> walkBinaryPartition (lowerC, upperC, right - divRnd Up (right - left), right) xs
 
 genSeatId :: (BinPartLst, BinPartLst) -> Integer
 genSeatId (row, seat) = ((walkBinaryPartition ('F', 'B', 0, 127) row) * 8) + (walkBinaryPartition ('L', 'R', 0, 7) seat)
