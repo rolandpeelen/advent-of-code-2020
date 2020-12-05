@@ -50,10 +50,10 @@ findAllMissing :: [Int] -> [Int] -> [Int]
 findAllMissing acc [] = acc
 findAllMissing acc [a, b] 
   | succ a == b = acc 
-  | otherwise = (succ a:acc)
+  | otherwise = ([succ a..pred b]++acc)
 findAllMissing acc (a:b:xs)
   | succ a == b = findAllMissing acc (b:xs)
-  | otherwise = findAllMissing (succ a:acc) (b:xs)
+  | otherwise = findAllMissing ([succ a..pred b]++acc) (b:xs)
 
 
 fn :: [String] -> [Int]
