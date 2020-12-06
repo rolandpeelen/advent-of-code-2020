@@ -6,7 +6,7 @@ main = do
   putStr $ show $ fn $ input
 
 groupAnswers :: [String] -> [[String]]
-groupAnswers xs = map (filter ((/=) "")) $ groupBy (\_ y -> y /= "") xs
+groupAnswers = map (filter ((/=) "")) . groupBy (\_ y -> y /= "")
 
 fn :: String -> Int
 fn xs = sum $ map (length . nub . unwords) $ groupAnswers $ lines xs

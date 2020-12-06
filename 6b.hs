@@ -6,10 +6,10 @@ main = do
   putStr $ show $ fn $ input
 
 groupAnswer :: [String] -> [[String]]
-groupAnswer xs = map (filter ((/=) "")) $ groupBy (\_ y -> y /= "") xs
+groupAnswer = map (filter ((/=) "")) . groupBy (\_ y -> y /= "")
 
 mergeAnswer :: [String] -> (Int, String)
-mergeAnswer x = (\ys -> (length ys, unwords ys)) x
+mergeAnswer = \ys -> (length ys, unwords ys)
 
 countOccurances :: Eq a => [a] -> a -> Int
 countOccurances xs y = length $ filter (y==) xs
