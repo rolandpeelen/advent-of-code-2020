@@ -1,9 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 import Data.List
 import Prelude
-
-magicRowPartitionLength = 7
 
 main = do
   input <- getContents
