@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Prelude
 import Data.List
+import Prelude
 
 magicRowPartitionLength = 7
 
@@ -9,18 +9,8 @@ main = do
   input <- getContents
   putStr $ show $ fn $ input
 
-concatIfNextEmpty :: [String] -> [String] -> [String]
-concatIfNextEmpty acc [] = acc
-concatIfNextEmpty acc [a, b] 
-  | a == "" && b == "" = acc
-  | a /= "" && b == "" = (acc++[a])
-  | otherwise = acc++[a++b]
-concatIfNextEmpty acc (a:b:xs)
-  | a == "" && b == "" = concatIfNextEmpty acc xs
-  | a /= "" && b == "" = concatIfNextEmpty ( acc++[a] ) xs
-  | otherwise = concatIfNextEmpty acc ((a++b):xs)
+groupAnswers :: [String] -> [[String]]
+groupAnswers xs = map (filter ((/=) "")) $ groupBy (\_ y -> y /= "") xs
 
-
-
---fn :: [String] -> [ C ]
-fn xs = sum $ map length $ map nub $ concatIfNextEmpty [] $ lines xs
+fn :: String -> Int
+fn xs = sum $ map (length . nub . unwords) $ groupAnswers $ lines xs
