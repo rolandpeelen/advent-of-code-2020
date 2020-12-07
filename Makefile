@@ -1,5 +1,6 @@
 FLAGS = -fPIC -O2 -g
-HFLAGS = $(FLAGS) -threaded -rtsopts -v0 -XNoImplicitPrelude
+PACKAGES = parsec
+HFLAGS = -package $(PACKAGES) $(FLAGS) -threaded -rtsopts -v0 -XNoImplicitPrelude
 DONE1 = $(wildcard [1-9][ab].hs)
 DONE2 = $(wildcard [12][1-9][ab].hs)
 
