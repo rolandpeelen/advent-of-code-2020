@@ -14,10 +14,10 @@ distclean: clean
 	@rm -f -- *.output
 
 %a.output: %a %.input
-	@./$< +RTS -N8 < $*.input > $@
+	@./$< +RTS -N12 < $*.input > $@
 
 %b.output: %b %.input
-	@./$< +RTS -N8 < $*.input > $@
+	@./$< +RTS -N12 < $*.input > $@
 
 %:: %.hs
 	@ghc $(HFLAGS) -o $@ $^
