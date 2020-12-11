@@ -1,7 +1,9 @@
-import Data.List.Index
+import Data.List.Index(indexed)
 import qualified Data.Map as M
 import Data.Maybe
 import Prelude
+
+data Direction = NE | N | NW | W | SW | S | SE | E
 
 data Space = Empty | Occupied | Floor deriving (Show, Eq)
 
@@ -18,8 +20,6 @@ type Grid = M.Map RowId Row
 main = do
   input <- getContents
   putStr $ show $ fn $ lines input
-
---putStr $ show $ fn $ lines $ input
 
 toSpace :: Char -> Space
 toSpace 'L' = Empty
@@ -39,29 +39,34 @@ flatten _ = Nothing
 safeGridLookup :: (Int, Int) -> Grid -> Maybe Space
 safeGridLookup (x, y) grid = flatten $ M.lookup x <$> M.lookup y grid
 
-generateCombinations :: Coordinate -> [Coordinate]
-generateCombinations (y, x) =
-  [ (left, above),
-    (x, above),
-    (right, above),
-    (left, y),
-    (right, y),
-    (left, below),
-    (x, below),
-    (right, below)
-  ]
+getNextCoordinate :: Direction -> Coordinate -> Coordinate
+getNextCoordinate NE (x, y) = (x -1, y -1)
+getNextCoordinate N (x, y) = (x, y - 1)
+getNextCoordinate NW (x, y) = (x + 1, y - 1)
+getNextCoordinate E (x, y) = (x - 1, y)
+getNextCoordinate W (x, y) = (x + 1, y)
+getNextCoordinate SE (x, y) = (x - 1, y + 1)
+getNextCoordinate S (x, y) = (x, y + 1)
+getNextCoordinate SW (x, y) = (x + 1, y + 1)
+
+getFirstSeatInDirection :: Grid -> Direction -> Coordinate -> Maybe Coordinate
+getFirstSeatInDirection grid d (x, y)
+  | t == Just Floor = getFirstSeatInDirection grid d newC
+  | isNothing t = Nothing
+  | otherwise = Just newC
   where
-    above = y -1
-    below = y + 1
-    left = x - 1
-    right = x + 1
+    newC = getNextCoordinate d (y, x)
+    t = safeGridLookup newC grid
+
+generateCombinations :: Grid -> Coordinate -> [Coordinate]
+generateCombinations grid c = mapMaybe (\x -> getFirstSeatInDirection grid x c) [NW, N, NE, W, E, SW, S, SE]
 
 countAdjacent :: Coordinate -> Grid -> Int
-countAdjacent c grid = length $ filter (Occupied ==) $ mapMaybe (flip safeGridLookup grid) $ generateCombinations c
+countAdjacent c grid = length $ filter (Occupied ==) $ mapMaybe (flip safeGridLookup grid) $ generateCombinations grid c
 
 next :: Coordinate -> Space -> Grid -> Space
 next (x, y) z grid
-  | z == Occupied && adjacents >= 4 = Empty
+  | z == Occupied && adjacents >= 5 = Empty
   | z == Empty && adjacents == 0 = Occupied
   | otherwise = z
   where
