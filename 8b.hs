@@ -9,9 +9,9 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ input
+  putStr $ show $ fn input
 
-data Action = Nop (Int) | Acc (Int) | Jump (Int) | Done deriving (Show)
+data Action = Nop Int | Acc Int | Jump Int | Done deriving (Show)
 
 -- START - Parsing
 intP :: Parsec String () Int
@@ -25,14 +25,13 @@ actionPG :: String -> (Int -> Action) -> Parsec String () Action
 actionPG x t = do
   try $ string x
   space
-  action <- t <$> intP
-  return action
+  t <$> intP
 
 instructionP :: Parsec String () Action
 instructionP =
-  actionPG "nop" (\x -> Nop (x))
-    <|> actionPG "acc" (\x -> Acc (x))
-    <|> actionPG "jmp" (\x -> Jump (x))
+  actionPG "nop" const Nop
+    <|> actionPG "acc" Acc
+    <|> actionPG "jmp" Jump
 
 setDone :: Maybe Action -> Maybe Action
 setDone _ = Just Done
@@ -59,15 +58,15 @@ type Acc = (Count, Step)
 
 type InstructionConfig = (Acc, Swap, NextIndex)
 
-data Exit = Success (Int) | Loop (Int) deriving (Show)
+data Exit = Success Int | Loop Int deriving (Show)
 
 -- Take an instruction config ((initialCount, initialStep), swapIdx, nextIdx)
 -- Then take a map of instructions
 -- Run them, swaping the Nop to Jump / Jump to Nop at the swapIdx
 runInstructions :: InstructionConfig -> M.Map Int Action -> Exit
 runInstructions ((count, step), swapIdx, nextIdx) map = case (step == swapIdx, M.lookup nextIdx map) of
-  (_, Nothing) -> Success (count)
-  (_, Just Done) -> Loop (count)
+  (_, Nothing) -> Success count
+  (_, Just Done) -> Loop count
   (_, Just (Acc x)) -> runInstructions ((count + x, incr step), swapIdx, incr nextIdx) (M.alter setDone nextIdx map)
   -- Execute as normal
   (False, Just (Nop _)) -> runInstructions ((count, incr step), swapIdx, incr nextIdx) (M.alter setDone nextIdx map)

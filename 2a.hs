@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Text.ParserCombinators.Parsec
 import Data.Either
+import Text.ParserCombinators.Parsec
 import Prelude
 
 main = do
@@ -29,8 +29,8 @@ passwordChecker (min, max, char, pass)
 
 folder :: Int -> String -> Int
 folder acc xs = case parse passwordParser "Some Error" xs of
-    Left _ -> acc 
-    Right passwordData -> acc + (passwordChecker passwordData)
+  Left _ -> acc
+  Right passwordData -> acc + (passwordChecker passwordData)
 
 fn :: [String] -> Int
 fn xs = foldl folder 0 xs

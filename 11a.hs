@@ -57,7 +57,7 @@ generateCombinations (y, x) =
     right = x + 1
 
 countAdjacent :: Coordinate -> Grid -> Int
-countAdjacent c grid = length $ filter (Occupied ==) $ mapMaybe (flip safeGridLookup grid) $ generateCombinations c
+countAdjacent c grid = length $ filter (Occupied ==) $ mapMaybe (`safeGridLookup` grid) $ generateCombinations c
 
 next :: Coordinate -> Space -> Grid -> Space
 next (x, y) z grid
@@ -67,11 +67,11 @@ next (x, y) z grid
   where
     adjacents = countAdjacent (x, y) grid
 
-getNextRow :: Int -> Grid -> Row -> Row
-getNextRow colId grid = M.mapWithKey (\rowId x -> next (colId, rowId) x grid)
+getNextRow :: Grid -> Int -> Row -> Row
+getNextRow grid colId = M.mapWithKey (\rowId x -> next (colId, rowId) x grid)
 
 getNextGrid :: Grid -> Grid
-getNextGrid grid = M.mapWithKey (\colId x -> getNextRow colId grid x) grid
+getNextGrid grid = M.mapWithKey (getNextRow grid) grid
 
 incr :: Int -> Int
 incr = (+ 1)

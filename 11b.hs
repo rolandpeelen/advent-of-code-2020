@@ -72,11 +72,11 @@ next (x, y) z grid
   where
     adjacents = countAdjacent (x, y) grid
 
-getNextRow :: Int -> Grid -> Row -> Row
-getNextRow colId grid = M.mapWithKey (\rowId x -> next (colId, rowId) x grid)
+getNextRow :: Grid -> Int -> Row -> Row
+getNextRow grid colId = M.mapWithKey (\rowId x -> next (colId, rowId) x grid)
 
 getNextGrid :: Grid -> Grid
-getNextGrid grid = M.mapWithKey (\colId x -> getNextRow colId grid x) grid
+getNextGrid grid = M.mapWithKey (getNextRow grid) grid
 
 incr :: Int -> Int
 incr = (+ 1)
@@ -94,5 +94,5 @@ countGrids x grid
   where
     next = getNextGrid grid
 
---fn :: [String] -> Int
+fn :: [String] -> Int
 fn xs = countGrids 0 $ makeIndexedMap $ map toRow xs

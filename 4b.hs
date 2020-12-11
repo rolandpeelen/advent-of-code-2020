@@ -8,7 +8,7 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ input
+  putStr $ show $ fn input
 
 data Validity = Valid | InValid | Skipped deriving (Eq)
 
@@ -27,18 +27,18 @@ boolToValidity True = Valid
 boolToValidity False = InValid
 
 isBetween :: Int -> Int -> Int -> Bool
-isBetween x y z = z >= x && z <= y 
+isBetween x y z = z >= x && z <= y
 
 validateHeight :: Maybe String -> Maybe String -> Validity
 validateHeight (Just "cm") (Just height) = boolToValidity $ isBetween 150 193 (read height)
 validateHeight (Just "in") (Just height) = boolToValidity $ isBetween 59 76 (read height)
-validateHeight _ _ = boolToValidity $ False
+validateHeight _ _ = boolToValidity False
 
 lengthIs :: Int -> [a] -> Bool
 lengthIs x xs = length xs == x
 
 isEyeColor :: String -> Bool
-isEyeColor x = case find (\y -> x == y) ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"] of
+isEyeColor x = case find (x ==) ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"] of
   Just _ -> True
   Nothing -> False
 
@@ -48,21 +48,20 @@ issueYearP = parserGen "iyr" (\x -> boolToValidity $ lengthIs 4 x && isBetween 2
 
 expirationYearP = parserGen "eyr" (\x -> boolToValidity $ lengthIs 4 x && isBetween 2020 2030 (read x))
 
-passportIdP = parserGen "pid" (\x -> boolToValidity $ lengthIs 9 x)
+passportIdP = parserGen "pid" boolToValidity . lengthIs 9
 
 eyeColorP = parserGen "ecl" (\x -> boolToValidity $ lengthIs 3 x && isEyeColor x)
 
-countryIdP = parserGen "cid" (\_ -> Skipped)
+countryIdP = parserGen "cid" const Skipped
 
 heightP :: GenParser Char Int Validity
 heightP = do
   try $ string "hgt"
   char ':'
-  height <- optionMaybe $ many1 $ digit
-  heightUnit <- optionMaybe $ many1 $ letter
+  height <- optionMaybe $ many1 digit
+  heightUnit <- optionMaybe $ many1 letter
   choice [space, newline]
   return (validateHeight heightUnit height)
-
 
 hairColorP :: GenParser Char Int Validity
 hairColorP = do
@@ -72,7 +71,6 @@ hairColorP = do
   choice [space, newline]
   return $ boolToValidity $ lengthIs 7 color && charMatchAt 0 '#' color
 
-
 parserGen :: String -> (String -> Validity) -> GenParser Char Int Validity
 parserGen x validator = do
   try $ string x
@@ -80,7 +78,6 @@ parserGen x validator = do
   str <- many1 $ choice [char '#', alphaNum]
   choice [space, newline]
   return $ validator str
-
 
 singlePassportParser :: GenParser Char Int ()
 singlePassportParser = do
@@ -97,18 +94,16 @@ singlePassportParser = do
           countryIdP
         ]
   state <- getState
-  setState (if ((length $ filter (\x -> x == Valid) valids) >= 7) then state + 1 else state)
+  setState (if length filter (== Valid) valids >= 7 then state + 1 else state)
   return ()
 
 passportParser :: GenParser Char Int Int
 passportParser = do
   many1 $ choice [singlePassportParser, skipMany1 newline]
   eof
-  state <- getState
-  return state
+  getState
 
 fn :: String -> String
 fn x = case runParser passportParser 0 "Err" x of
   Left err -> show err
-  Right x -> show $ x
-
+  Right x -> show x

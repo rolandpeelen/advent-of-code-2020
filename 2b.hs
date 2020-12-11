@@ -39,7 +39,7 @@ passwordChecker (min, max, char, pass) = case (charMatchAt (min - 1) char pass, 
 folder :: Int -> String -> Int
 folder acc xs = case parse passwordParser "Some Error" xs of
   Left _ -> acc
-  Right passwordData -> acc + (passwordChecker passwordData)
+  Right passwordData -> acc + passwordChecker passwordData
 
 fn :: [String] -> Int
-fn xs = foldl folder 0 xs
+fn = foldl folder 0

@@ -4,15 +4,16 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ lines $ input
+  putStr $ show $ fn $ lines input
 
 sumsToSet :: [Int] -> S.Set Int
 sumsToSet xs = S.fromList $ [a + b | a <- xs, b <- xs]
 
 findMissing :: S.Set Int -> Int -> Maybe Int
-findMissing xs y = case (S.member y xs) of
-  True -> Nothing
-  False -> Just y
+findMissing xs y =
+  if S.member y xs
+    then Nothing
+    else Just y
 
 findAllMissing :: [Int] -> Int
 findAllMissing [] = -1
