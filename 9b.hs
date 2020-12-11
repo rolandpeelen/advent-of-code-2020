@@ -2,12 +2,12 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ lines $ input
+  putStr $ show $ fn $ lines input
 
 findMax :: Int -> [Int] -> [Int] -> Maybe Int
 findMax _ _ [] = Nothing
 findMax x acc (y : ys)
-  | rolling == x = Just ((maximum acc) + (minimum acc))
+  | rolling == x = Just (maximum acc + minimum acc)
   | rolling < x = findMax x (acc ++ [y]) ys
   | rolling > x = findMax x (drop 1 acc) (y : ys)
   where

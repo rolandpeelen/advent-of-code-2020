@@ -9,9 +9,9 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ input
+  putStr $ show $ fn input
 
-data Action = Nop | Acc (Int) | Jump (Int) | Done deriving (Show)
+data Action = Nop | Acc Int | Jump Int | Done deriving (Show)
 
 intP :: Parsec String () Int
 intP = read <$> (plus <|> minus <|> number)
@@ -24,24 +24,23 @@ actionPG :: String -> (Int -> Action) -> Parsec String () Action
 actionPG x t = do
   try $ string x
   space
-  action <- t <$> intP
-  return action
+  t <$> intP
 
 instructionP :: Parsec String () Action
 instructionP =
-  actionPG "nop" (\_ -> Nop)
-    <|> actionPG "acc" (\x -> Acc (x))
-    <|> actionPG "jmp" (\x -> Jump (x))
+  actionPG "nop" const Nop
+    <|> actionPG "acc" Acc
+    <|> actionPG "jmp" Jump
 
 setDone :: Maybe Action -> Maybe Action
 setDone _ = Just Done
 
 runInstructions :: Int -> Int -> M.Map Int Action -> Int
-runInstructions acc idx map = case (M.lookup idx map) of 
+runInstructions acc idx map = case M.lookup idx map of
   Nothing -> acc
   Just Done -> acc
-  Just (Acc x) -> runInstructions (acc + x) (idx+1) (M.alter setDone idx map)
-  Just (Jump x) -> runInstructions acc (idx+x) (M.alter setDone idx map)
-  Just Nop -> runInstructions acc (idx+1) (M.alter setDone idx map)
+  Just (Acc x) -> runInstructions (acc + x) (idx + 1) (M.alter setDone idx map)
+  Just (Jump x) -> runInstructions acc (idx + x) (M.alter setDone idx map)
+  Just Nop -> runInstructions acc (idx + 1) (M.alter setDone idx map)
 
 fn xs = runInstructions 0 0 $ M.fromList $ indexed $ rights $ map (runParser instructionP () "") $ lines xs

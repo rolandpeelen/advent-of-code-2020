@@ -1,8 +1,11 @@
 import Prelude
 
 data CharMatch = Match | NoMatch | OutOfBounds
+
 type Coordinate = (Int, Int)
+
 type IncPair = (Int, Int)
+
 type Count = Int
 
 main = do
