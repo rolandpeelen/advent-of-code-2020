@@ -8,3 +8,6 @@ Individual files will be made per day;
 - [Day Five](docs/5.md)
 - [Day Six](docs/6.md)
 - [Day Seven](docs/7.md)
+- [Day Eight](docs/8.md)
+- [Day Nine](docs/9.md)
+- [Day Ten](docs/10.md)
