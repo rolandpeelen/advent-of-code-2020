@@ -96,5 +96,4 @@ countGrids x grid
 
 fn :: [String] -> Int
 fn xs = countGrids 0 $ makeIndexedMap $ map toRow xs
-adj c grid = justs $ map (flip safeGridLookup grid) $ generateCombinations c
 
