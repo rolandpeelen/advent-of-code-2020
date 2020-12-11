@@ -8,7 +8,7 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ lines $ input
+  putStr $ show $ fn $ lines input
 
 type Inner = String
 
@@ -17,9 +17,6 @@ type Outer = String
 type Bag = (Outer, [Inner])
 
 type Inversed = (Inner, Outer)
-
-justs :: [Maybe a] -> [a]
-justs = (map fromJust . filter isJust)
 
 --mirrored gold bags contain 3 light teal bags.
 innerBag :: Parsec String () String
@@ -47,20 +44,20 @@ bagParser = do
 
 -- Make (Outer, [Inners]) to [(Inner, Outer)]
 inverseBag :: Bag -> [Inversed]
-inverseBag (x, xs) = map (\y -> (y, x)) xs
+inverseBag (x, xs) = map (,x) xs
 
 -- Make [(Outer, [Inners])] to [[(Inner, Outer)]]
 inverseBags :: [Bag] -> [Inversed]
-inverseBags xs = concat $ map inverseBag xs
+inverseBags = concatMap inverseBag
 
 -- From a list of strings ('inner'), find a list of strings ('outer')
 findParents :: [String] -> [Inversed] -> [String]
-findParents xs ys = map snd $ concat $ map (\x -> filter ((x ==) . fst) ys) xs
+findParents xs ys = map snd $ concatMap (\x -> filter ((x ==) . fst) ys) xs
 
 -- From a list of strings ('inner'), find a list of strings ('outer')
 -- If there are 'outer' strings, do it again
 findParentsRec :: [String] -> [String] -> [Inversed] -> [String]
-findParentsRec acc xs ys = case (findParents xs ys) of
+findParentsRec acc xs ys = case findParents xs ys of
   [] -> acc
   zs -> findParentsRec (zs ++ acc) zs ys
 

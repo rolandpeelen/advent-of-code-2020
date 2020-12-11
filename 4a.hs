@@ -7,8 +7,7 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ input
-
+  putStr $ show $ fn input
 
 birthyearP = parserGen "byr" True
 
@@ -50,17 +49,16 @@ singlePassportParser = do
           countryIdP
         ]
   state <- getState
-  setState (if (sum valids >= 7) then state + 1 else state)
+  setState (if sum valids >= 7 then state + 1 else state)
   return ()
 
 passportParser :: GenParser Char Int Int
 passportParser = do
   many1 $ choice [singlePassportParser, skipMany1 newline]
   eof
-  state <- getState
-  return state
+  join <- getState
 
 fn :: String -> String
 fn x = case runParser passportParser 0 "Err" x of
   Left err -> show err
-  Right x -> show $ x
+  Right x -> show x

@@ -17,10 +17,10 @@ charMatchAt x char str = case safeIndex str x of
 folder :: (Int, Int, Int) -> [String] -> Int
 folder (trees, _, _) [] = trees
 folder (trees, runningOffset, offset) (head : xs) =
-  case charMatchAt (runningOffset `mod` length head) '#' head of
-    True -> folder (trees + 1, runningOffset + offset , offset) xs
-    False -> folder (trees, runningOffset + offset, offset) xs
+  if charMatchAt (runningOffset `mod` length head) '#' head
+    then folder (trees + 1, runningOffset + offset, offset) xs
+    else folder (trees, runningOffset + offset, offset) xs
 
 -- (trees, offset, runningOffset)
 fn :: [String] -> Int
-fn xs = folder (0, 0, 3) xs -- This works because my 0 is a '.' If it was a '#', this wouldn't work.
+fn = folder (0, 0, 3) -- This works because my 0 is a '.' If it was a '#', this wouldn't work.

@@ -7,7 +7,7 @@ import Prelude
 
 main = do
   input <- getContents
-  putStr $ show $ fn $ lines $ input
+  putStr $ show $ fn $ lines input
 
 type BagName = String
 
@@ -15,7 +15,7 @@ type BagCount = Int
 
 type InnerBag = (Int, String)
 
-type OuterBag = (BagName, [(InnerBag)])
+type OuterBag = (BagName, [InnerBag])
 
 innerBag :: Parsec String () (Int, String)
 innerBag = do
@@ -41,11 +41,11 @@ bagParser = do
   return (outerBag, innerBags)
 
 addToCount :: BagCount -> [InnerBag] -> Int
-addToCount acc xs = foldl (\acc x -> (fst x) + acc) acc xs
+addToCount = foldl (\acc x -> fst x + acc)
 
 -- Given a list of Outerbags, filter them by name
 filterBag :: BagName -> [OuterBag] -> [OuterBag]
-filterBag bagName = filter (\y -> (fst y) == bagName)
+filterBag bagName = filter (\y -> fst y == bagName)
 
 -- Multiple the amount of the bags that can be inside one other bag
 -- by the parent bag. Multiplying because if we have 10 bags, that all can have
@@ -54,7 +54,7 @@ filterBag bagName = filter (\y -> (fst y) == bagName)
 -- ie. 10 [(5, "b"), (3, "c")] where 10 is the amount of bags in the parent
 -- to [(50, "b"), (30, "c")]
 multiplyCountBy :: BagCount -> [InnerBag] -> [InnerBag]
-multiplyCountBy count = map (\y -> (((fst y) * count), snd y))
+multiplyCountBy count = map (\y -> (fst y * count, snd y))
 
 -- This takes a list of outer bags and an innerbag,
 -- [("a", [(4, "b"),(12, "c")]), ("e", [(2, "f"), (4, "a")])] (12, "e")
@@ -68,20 +68,20 @@ multiplyCountBy count = map (\y -> (((fst y) * count), snd y))
 -- [[(2, "f"), (4, "a")]] 12
 -- [[(24, "f"), (48, "a")]] 12
 countBags :: [OuterBag] -> InnerBag -> [InnerBag]
-countBags xs (occurances, bagName) = multiplyCountBy occurances $ concat $ map snd $ filterBag bagName xs
+countBags xs (occurances, bagName) = multiplyCountBy occurances $ concatMap snd $ filterBag bagName xs
 
 -- Given a list of Inners, map them to the structure above
 -- [(12, "e"), (3, "a")]
 -- [[(12, "b"), (36, "c")], [(24, "f"), (48, "a")]]
 findChildren :: [InnerBag] -> [OuterBag] -> [InnerBag]
-findChildren xs ys = concat $ map (countBags ys) xs
+findChildren xs ys = concatMap (countBags ys) xs
 
 -- A recursive wrapper to the one above, that takes the output, and for every
 -- iteration, add the amount of bags to the count
 -- [[(12, "b"), (36, "c")], [(24, "f"), (48, "a")]]
 -- count -> 12 + 36 + 24 + 48
 findChildrenRec :: Int -> [InnerBag] -> [OuterBag] -> Int
-findChildrenRec acc xs ys = case (findChildren xs ys) of
+findChildrenRec acc xs ys = case findChildren xs ys of
   [] -> acc
   zs -> findChildrenRec (addToCount acc zs) zs ys
 
