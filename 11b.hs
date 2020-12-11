@@ -1,7 +1,11 @@
-import Data.List.Index(indexed)
+import Data.List.Index
 import qualified Data.Map as M
 import Data.Maybe
 import Prelude
+
+main = do
+  input <- getContents
+  putStr $ show $ fn $ lines input
 
 data Direction = NE | N | NW | W | SW | S | SE | E
 
@@ -16,10 +20,6 @@ type ColId = Int
 type Row = M.Map ColId Space
 
 type Grid = M.Map RowId Row
-
-main = do
-  input <- getContents
-  putStr $ show $ fn $ lines input
 
 toSpace :: Char -> Space
 toSpace 'L' = Empty
@@ -37,7 +37,7 @@ flatten (Just x) = x
 flatten _ = Nothing
 
 safeGridLookup :: (Int, Int) -> Grid -> Maybe Space
-safeGridLookup (x, y) grid = flatten $ M.lookup x <$> M.lookup y grid
+safeGridLookup (y, x) grid = flatten $ M.lookup x <$> M.lookup y grid
 
 getNextCoordinate :: Direction -> Coordinate -> Coordinate
 getNextCoordinate NE (x, y) = (x -1, y -1)
@@ -55,7 +55,7 @@ getFirstSeatInDirection grid d (x, y)
   | isNothing t = Nothing
   | otherwise = Just newC
   where
-    newC = getNextCoordinate d (y, x)
+    newC = getNextCoordinate d (x, y)
     t = safeGridLookup newC grid
 
 generateCombinations :: Grid -> Coordinate -> [Coordinate]
@@ -94,5 +94,5 @@ countGrids x grid
   where
     next = getNextGrid grid
 
-fn :: [String] -> Int
+--fn :: [String] -> Int
 fn xs = countGrids 0 $ makeIndexedMap $ map toRow xs
