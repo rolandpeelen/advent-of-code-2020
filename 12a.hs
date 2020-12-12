@@ -67,6 +67,6 @@ getNextCoordinate p (F z) = forward z p
 startPosition = ((0, 0), 90)
 
 getMannhattanDistance :: Coordinate -> Int
-getMannhattanDistance (x, y) = x + y
+getMannhattanDistance (x, y) = abs $ x + y
 
 fn xs = getMannhattanDistance . fst $ foldl' getNextCoordinate startPosition $ rights $ map (runParser instructionP () "") xs
