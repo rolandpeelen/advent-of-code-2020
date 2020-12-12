@@ -29,7 +29,7 @@ actionPG x t = do
 
 instructionP :: Parsec String () Action
 instructionP =
-  actionPG "nop" const Nop
+  actionPG "nop" Nop
     <|> actionPG "acc" Acc
     <|> actionPG "jmp" Jump
 
