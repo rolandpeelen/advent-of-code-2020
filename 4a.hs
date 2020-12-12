@@ -56,7 +56,8 @@ passportParser :: GenParser Char Int Int
 passportParser = do
   many1 $ choice [singlePassportParser, skipMany1 newline]
   eof
-  join <- getState
+  state <- getState
+  return state
 
 fn :: String -> String
 fn x = case runParser passportParser 0 "Err" x of

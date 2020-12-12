@@ -48,11 +48,11 @@ issueYearP = parserGen "iyr" (\x -> boolToValidity $ lengthIs 4 x && isBetween 2
 
 expirationYearP = parserGen "eyr" (\x -> boolToValidity $ lengthIs 4 x && isBetween 2020 2030 (read x))
 
-passportIdP = parserGen "pid" boolToValidity . lengthIs 9
+passportIdP = parserGen "pid" (boolToValidity . lengthIs 9)
 
 eyeColorP = parserGen "ecl" (\x -> boolToValidity $ lengthIs 3 x && isEyeColor x)
 
-countryIdP = parserGen "cid" const Skipped
+countryIdP = parserGen "cid" (const Skipped)
 
 heightP :: GenParser Char Int Validity
 heightP = do
@@ -94,7 +94,7 @@ singlePassportParser = do
           countryIdP
         ]
   state <- getState
-  setState (if length filter (== Valid) valids >= 7 then state + 1 else state)
+  setState (if length (filter (== Valid) valids) >= 7 then state + 1 else state)
   return ()
 
 passportParser :: GenParser Char Int Int
