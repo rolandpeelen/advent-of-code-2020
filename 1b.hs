@@ -1,4 +1,5 @@
 import Data.List
+import qualified Data.Set as S
 import Prelude
 
 main :: IO ()
@@ -9,14 +10,15 @@ main = do
 filterChars :: String -> String -> String
 filterChars xs = filter (not . (`elem` xs))
 
-findNo :: [Int] -> Int -> [Int] -> Int
-findNo seen count (current : rest) = case seenCount' of
-  Just no -> no
-  Nothing -> findNo seen' count' rest
+findNo :: S.Set Int -> Int -> [Int] -> Int
+findNo seen count (current : rest) =
+  if seenCount'
+    then count'
+    else findNo seen' count' rest
   where
-    seenCount' = find (== count') seen
     count' = count + current
-    seen' = count' : seen
+    seen' = S.insert count' seen
+    seenCount' = S.member count' seen
 
 fn :: [Int] -> Int
-fn xs = findNo [] 0 (cycle xs)
+fn xs = findNo S.empty 0 (cycle xs)
