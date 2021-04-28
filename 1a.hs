@@ -2,21 +2,14 @@ import Prelude
 
 main :: IO ()
 main = do
-  -- Get the inputs
   input <- getContents
+  (putStr . show . fn . lines) input
 
-  -- right to left:
-  -- take the input and push it through the composition of:
-  -- 1. split input by line (returning [String])
-  -- 2. map read function over strings to turn them into integers (returning [Integer])
-  -- 3. call 'someFunc' over that list
-  -- 4. print the return of someFunc
-  (putStr . someFunc . map read . lines) input
+filterChars :: String -> String -> String
+filterChars xs = filter (not . (`elem` xs))
 
-  -- Print the input back
-  putStr input
-
-
--- The function to run everything through
-someFunc :: [Integer] -> String
-someFunc _ = "Hello"
+-- While we can parse (-20) as a number, we can't parse (+20). So let's
+-- filter them out first, using the helper above, then we can simply
+-- sum the numbers to get the answer.
+fn :: [String] -> Int
+fn = sum . map (read . filterChars "+")
